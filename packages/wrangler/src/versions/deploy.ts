@@ -9,6 +9,7 @@ import {
 } from "@cloudflare/cli/interactive";
 import { fetchResult } from "../cfetch";
 import { createCommand } from "../core/create-command";
+import { getCIOverrideName } from "../environment-variables/misc-variables";
 import { UserError } from "../errors";
 import { isNonInteractiveOrCI } from "../is-interactive";
 import { logger } from "../logger";
