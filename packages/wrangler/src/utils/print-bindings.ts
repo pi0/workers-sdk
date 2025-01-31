@@ -133,9 +133,11 @@ export function printBindings(
 
 					return {
 						key: name,
-						value: addSuffix(value, {
-							isSimulatedLocally: true,
-						}),
+						value: script_name
+							? value
+							: addSuffix(value, {
+									isSimulatedLocally: true,
+								}),
 					};
 				}
 			),
@@ -153,7 +155,7 @@ export function printBindings(
 
 				return {
 					key: binding,
-					value: addSuffix(value),
+					value: script_name ? value : addSuffix(value),
 				};
 			}),
 		});
@@ -315,7 +317,7 @@ export function printBindings(
 				}
 				return {
 					key: binding,
-					value: addSuffix(value),
+					value,
 				};
 			}),
 		});
@@ -427,7 +429,7 @@ export function printBindings(
 				}
 				return {
 					key,
-					value: addSuffix(parsedValue),
+					value: parsedValue,
 				};
 			}),
 		});
@@ -489,7 +491,7 @@ export function printBindings(
 
 	if (context.local) {
 		logger.log(
-			`Your Worker and resources are simulated locally via Miniflare. For more information, see: https://developers.cloudflare.com/workers/testing/local-development.\n`
+			`\nYour Worker and resources are simulated locally via Miniflare. For more information, see: https://developers.cloudflare.com/workers/testing/local-development.\n`
 		);
 	}
 
@@ -569,7 +571,7 @@ function createAddSuffix({
 		}
 
 		return isSimulatedLocally
-			? `${normalizedValue} [Simulated Locally]`
-			: `${normalizedValue} [Connected to Remote Resource]`;
+			? `${normalizedValue} [simulated locally]`
+			: `${normalizedValue} [connected to remote resource]`;
 	};
 }
