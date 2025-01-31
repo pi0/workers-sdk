@@ -15,6 +15,17 @@ function addLocalSuffix(
 	return `${id}${local ? " (local)" : ""}`;
 }
 
+function addRemoteSuffix(
+	id: string | symbol | undefined,
+	remote: boolean = false
+) {
+	if (!id || typeof id === "symbol") {
+		id = "";
+	}
+
+	return `${id}${remote ? " (remote)" : ""}`;
+}
+
 export const friendlyBindingNames: Record<
 	keyof CfWorkerInit["bindings"],
 	string
@@ -158,7 +169,7 @@ export function printBindings(
 
 				return {
 					key: binding,
-					value,
+					value: addRemoteSuffix(value),
 				};
 			}),
 		});
@@ -183,10 +194,11 @@ export function printBindings(
 				({ name, destination_address, allowed_destination_addresses }) => {
 					return {
 						key: name,
-						value:
+						value: addRemoteSuffix(
 							destination_address ||
-							allowed_destination_addresses?.join(", ") ||
-							"unrestricted",
+								allowed_destination_addresses?.join(", ") ||
+								"unrestricted"
+						),
 					};
 				}
 			),
@@ -236,7 +248,7 @@ export function printBindings(
 			entries: vectorize.map(({ binding, index_name }) => {
 				return {
 					key: binding,
-					value: index_name,
+					value: addRemoteSuffix(index_name),
 				};
 			}),
 		});
@@ -278,7 +290,7 @@ export function printBindings(
 			entries: logfwdr.bindings.map((binding) => {
 				return {
 					key: binding.name,
-					value: binding.destination,
+					value: addRemoteSuffix(binding.destination),
 				};
 			}),
 		});
@@ -309,7 +321,7 @@ export function printBindings(
 				}
 				return {
 					key: binding,
-					value,
+					value: addRemoteSuffix(value),
 				};
 			}),
 		});
@@ -324,7 +336,7 @@ export function printBindings(
 			entries: analytics_engine_datasets.map(({ binding, dataset }) => {
 				return {
 					key: binding,
-					value: dataset ?? binding,
+					value: addRemoteSuffix(dataset ?? binding),
 				};
 			}),
 		});
@@ -335,7 +347,7 @@ export function printBindings(
 			name: friendlyBindingNames.text_blobs,
 			entries: Object.entries(text_blobs).map(([key, value]) => ({
 				key,
-				value: truncate(value),
+				value: addRemoteSuffix(truncate(value)),
 			})),
 		});
 	}
@@ -361,10 +373,13 @@ export function printBindings(
 
 	if (ai !== undefined) {
 		const entries: [{ key: string; value: string | boolean }] = [
-			{ key: "Name", value: ai.binding },
+			{ key: "Name", value: addRemoteSuffix(ai.binding) },
 		];
 		if (ai.staging) {
-			entries.push({ key: "Staging", value: ai.staging });
+			entries.push({
+				key: "Staging",
+				value: addRemoteSuffix(ai.staging.toString()),
+			});
 		}
 
 		output.push({
@@ -378,7 +393,7 @@ export function printBindings(
 			name: friendlyBindingNames.pipelines,
 			entries: pipelines.map(({ binding, pipeline }) => ({
 				key: binding,
-				value: pipeline,
+				value: addRemoteSuffix(pipeline),
 			})),
 		});
 	}
@@ -386,7 +401,9 @@ export function printBindings(
 	if (version_metadata !== undefined) {
 		output.push({
 			name: friendlyBindingNames.version_metadata,
-			entries: [{ key: "Name", value: version_metadata.binding }],
+			entries: [
+				{ key: "Name", value: addRemoteSuffix(version_metadata.binding) },
+			],
 		});
 	}
 
@@ -395,7 +412,7 @@ export function printBindings(
 			name: friendlyBindingNames.unsafe,
 			entries: unsafe.bindings.map(({ name, type }) => ({
 				key: type,
-				value: name,
+				value: addRemoteSuffix(name),
 			})),
 		});
 	}
@@ -414,7 +431,7 @@ export function printBindings(
 				}
 				return {
 					key,
-					value: parsedValue,
+					value: addRemoteSuffix(parsedValue),
 				};
 			}),
 		});
@@ -425,7 +442,9 @@ export function printBindings(
 			name: friendlyBindingNames.wasm_modules,
 			entries: Object.entries(wasm_modules).map(([key, value]) => ({
 				key,
-				value: typeof value === "string" ? truncate(value) : "<Wasm>",
+				value: addRemoteSuffix(
+					typeof value === "string" ? truncate(value) : "<Wasm>"
+				),
 			})),
 		});
 	}
@@ -436,9 +455,11 @@ export function printBindings(
 			entries: dispatch_namespaces.map(({ binding, namespace, outbound }) => {
 				return {
 					key: binding,
-					value: outbound
-						? `${namespace} (outbound -> ${outbound.service})`
-						: namespace,
+					value: addRemoteSuffix(
+						outbound
+							? `${namespace} (outbound -> ${outbound.service})`
+							: namespace
+					),
 				};
 			}),
 		});
@@ -450,7 +471,7 @@ export function printBindings(
 			entries: mtls_certificates.map(({ binding, certificate_id }) => {
 				return {
 					key: binding,
-					value: certificate_id,
+					value: addRemoteSuffix(certificate_id),
 				};
 			}),
 		});
@@ -461,13 +482,19 @@ export function printBindings(
 			name: friendlyBindingNames.unsafe,
 			entries: Object.entries(unsafe.metadata).map(([key, value]) => ({
 				key,
-				value: JSON.stringify(value),
+				value: addRemoteSuffix(JSON.stringify(value)),
 			})),
 		});
 	}
 
 	if (output.length === 0) {
 		return;
+	}
+
+	if (context.local) {
+		logger.log(
+			`Your Worker and resources are simulated locally via Miniflare. For more information, see: https://developers.cloudflare.com/workers/testing/local-development.\n`
+		);
 	}
 
 	let title: string;
@@ -498,6 +525,12 @@ export function printBindings(
 	if (hasConnectionStatus) {
 		logger.once.info(
 			`\nService bindings & durable object bindings connect to other \`wrangler dev\` processes running locally, with their connection status indicated by ${chalk.green("[connected]")} or ${chalk.red("[not connected]")}. For more details, refer to https://developers.cloudflare.com/workers/runtime-apis/bindings/service-bindings/#local-development\n`
+		);
+	}
+
+	if (context.local) {
+		logger.log(
+			`\nUse "wrangler dev --remote" to run both your Worker and all bindings remotely (https://developers.cloudflare.com/workers/testing/local-development/#develop-using-remote-resources-and-bindings).\n`
 		);
 	}
 }
