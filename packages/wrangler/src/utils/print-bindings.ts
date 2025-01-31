@@ -491,7 +491,7 @@ export function printBindings(
 
 	if (context.local) {
 		logger.log(
-			`\nYour Worker and resources are simulated locally via Miniflare. For more information, see: https://developers.cloudflare.com/workers/testing/local-development.\n`
+			`Your Worker and resources are simulated locally via Miniflare. For more information, see: https://developers.cloudflare.com/workers/testing/local-development.\n`
 		);
 	}
 
