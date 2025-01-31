@@ -4,40 +4,6 @@ import { logger } from "../logger";
 import type { CfWorkerInit } from "../deployment-bundle/worker";
 import type { WorkerRegistry } from "../dev-registry";
 
-function normalizeValue(value: string | symbol | undefined) {
-	if (!value || typeof value === "symbol") {
-		return "";
-	}
-
-	return value;
-}
-function createAddSuffix({
-	isProvisioning = false,
-	isLocalDev = false,
-}: {
-	isProvisioning?: boolean;
-	isLocalDev?: boolean;
-}) {
-	return function addSuffix(
-		value: string | symbol | undefined,
-		{
-			isSimulatedLocally = false,
-		}: {
-			isSimulatedLocally?: boolean;
-		} = {}
-	) {
-		const normalizedValue = normalizeValue(value);
-
-		if (isProvisioning || !isLocalDev) {
-			return normalizedValue;
-		}
-
-		return isSimulatedLocally
-			? `${normalizedValue} [Simulated Locally]`
-			: `${normalizeValue} [Connected to Remote Resource]`;
-	};
-}
-
 export const friendlyBindingNames: Record<
 	keyof CfWorkerInit["bindings"],
 	string
@@ -563,4 +529,47 @@ export function printBindings(
 			`\nUse "wrangler dev --remote" to run both your Worker and all bindings remotely (https://developers.cloudflare.com/workers/testing/local-development/#develop-using-remote-resources-and-bindings).\n`
 		);
 	}
+}
+
+function normalizeValue(value: string | symbol | undefined) {
+	if (!value || typeof value === "symbol") {
+		return "";
+	}
+
+	return value;
+}
+
+/**
+ * Creates a function for adding a suffix to the value of a binding in the console.
+ *
+ * The suffix is only for local dev so it can be used to determine whether a binding is
+ * simulated locally or connected to a remote resource.
+ *
+ * We don't show the suffix when provisioning because the bindings are not yet available in local dev.
+ */
+function createAddSuffix({
+	isProvisioning = false,
+	isLocalDev = false,
+}: {
+	isProvisioning?: boolean;
+	isLocalDev?: boolean;
+}) {
+	return function addSuffix(
+		value: string | symbol | undefined,
+		{
+			isSimulatedLocally = false,
+		}: {
+			isSimulatedLocally?: boolean;
+		} = {}
+	) {
+		const normalizedValue = normalizeValue(value);
+
+		if (isProvisioning || !isLocalDev) {
+			return normalizedValue;
+		}
+
+		return isSimulatedLocally
+			? `${normalizedValue} [Simulated Locally]`
+			: `${normalizedValue} [Connected to Remote Resource]`;
+	};
 }
