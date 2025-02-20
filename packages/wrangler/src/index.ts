@@ -226,7 +226,6 @@ export function createCLIParser(argv: string[]) {
 		.option("cwd", {
 			describe:
 				"Run as if Wrangler was started in the specified directory instead of the current working directory",
-			alias: "C",
 			type: "string",
 			requiresArg: true,
 		})

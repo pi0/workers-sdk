@@ -69,7 +69,7 @@ describe("wrangler", () => {
 
 				GLOBAL FLAGS
 				  -c, --config   Path to Wrangler configuration file  [string]
-				  -C, --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
+				      --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
 				  -e, --env      Environment to use for operations, and for selecting .env and .dev.vars files  [string]
 				  -h, --help     Show help  [boolean]
 				  -v, --version  Show version number  [boolean]
@@ -127,7 +127,7 @@ describe("wrangler", () => {
 
 				GLOBAL FLAGS
 				  -c, --config   Path to Wrangler configuration file  [string]
-				  -C, --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
+				      --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
 				  -e, --env      Environment to use for operations, and for selecting .env and .dev.vars files  [string]
 				  -h, --help     Show help  [boolean]
 				  -v, --version  Show version number  [boolean]
@@ -157,10 +157,10 @@ describe("wrangler", () => {
 			);
 		});
 
-		it("should change cwd with -C, --cwd", async () => {
+		it("should change cwd with --cwd", async () => {
 			const spy = vi.spyOn(process, "chdir").mockImplementation(() => {});
-			await Promise.all([runWrangler("-C /path"), runWrangler("--cwd /path")]);
-			expect(process.chdir).toHaveBeenCalledTimes(2);
+			await runWrangler("--cwd /path");
+			expect(process.chdir).toHaveBeenCalledTimes(1);
 			expect(process.chdir).toHaveBeenCalledWith("/path");
 			spy.mockRestore();
 		});
@@ -202,7 +202,7 @@ describe("wrangler", () => {
 
 				GLOBAL FLAGS
 				  -c, --config   Path to Wrangler configuration file  [string]
-				  -C, --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
+				      --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
 				  -e, --env      Environment to use for operations, and for selecting .env and .dev.vars files  [string]
 				  -h, --help     Show help  [boolean]
 				  -v, --version  Show version number  [boolean]"
@@ -224,7 +224,7 @@ describe("wrangler", () => {
 
 				GLOBAL FLAGS
 				  -c, --config   Path to Wrangler configuration file  [string]
-				  -C, --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
+				      --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
 				  -e, --env      Environment to use for operations, and for selecting .env and .dev.vars files  [string]
 				  -h, --help     Show help  [boolean]
 				  -v, --version  Show version number  [boolean]"
@@ -247,7 +247,7 @@ describe("wrangler", () => {
 
 				GLOBAL FLAGS
 				  -c, --config   Path to Wrangler configuration file  [string]
-				  -C, --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
+				      --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
 				  -e, --env      Environment to use for operations, and for selecting .env and .dev.vars files  [string]
 				  -h, --help     Show help  [boolean]
 				  -v, --version  Show version number  [boolean]"
@@ -268,7 +268,7 @@ describe("wrangler", () => {
 
 				GLOBAL FLAGS
 				  -c, --config   Path to Wrangler configuration file  [string]
-				  -C, --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
+				      --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
 				  -e, --env      Environment to use for operations, and for selecting .env and .dev.vars files  [string]
 				  -h, --help     Show help  [boolean]
 				  -v, --version  Show version number  [boolean]"
@@ -289,7 +289,7 @@ describe("wrangler", () => {
 
 				GLOBAL FLAGS
 				  -c, --config   Path to Wrangler configuration file  [string]
-				  -C, --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
+				      --cwd      Run as if Wrangler was started in the specified directory instead of the current working directory  [string]
 				  -e, --env      Environment to use for operations, and for selecting .env and .dev.vars files  [string]
 				  -h, --help     Show help  [boolean]
 				  -v, --version  Show version number  [boolean]"
